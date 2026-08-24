@@ -29,6 +29,7 @@
       color: var(--ink);
       background: #fff;
       letter-spacing: 0;
+      overflow-x: hidden;
     }
 
     a {
@@ -1799,7 +1800,8 @@
 
     @media (max-width: 820px) {
       .container {
-        width: min(100% - 30px, 680px);
+        width: calc(100% - 30px);
+        max-width: 680px;
       }
 
       .header-inner {
@@ -2051,7 +2053,9 @@
       }
 
       .hero h1 {
-        font-size: 34px;
+        max-width: 100%;
+        font-size: 32px;
+        overflow-wrap: break-word;
       }
 
       .hero-art {
@@ -2064,7 +2068,7 @@
       }
 
       .container {
-        width: min(100% - 24px, 680px);
+        width: calc(100% - 24px);
       }
 
       .route-heading {
