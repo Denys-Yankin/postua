@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 112" role="img" aria-labelledby="title">
+  <title id="title">POST UA Service</title>
+  <rect width="120" height="112" fill="#fff"/>
+  <g fill="none" stroke="#d6b300" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M50 15c9.4-8 24-7.1 32.2 2.3 8.3 9.5 7.3 24-2.2 32.3-8.1 7.1-20 7.5-28.5 1.5" stroke-width="7.5"/>
+    <path d="M40 13v43" stroke-width="9"/>
+    <path d="M40 18c4.5-5.8 11.2-9.2 19-9.2" stroke-width="7.5"/>
+    <circle cx="61.5" cy="32.2" r="10.2" fill="#fff" stroke="#d6b300" stroke-width="7.2"/>
+  </g>
+  <text x="60" y="76" text-anchor="middle"
+        font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="900"
+        fill="#101010" letter-spacing=".6">POST UA</text>
+  <g fill="#101010">
+    <rect x="19" y="86.5" width="82" height="2.2" rx="1.1"/>
+    <text x="60" y="101" text-anchor="middle"
+          font-family="Arial, Helvetica, sans-serif" font-size="8" font-weight="800"
+          letter-spacing="8.3">SERVICE</text>
+  </g>
+</svg>

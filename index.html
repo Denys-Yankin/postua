@@ -1,0 +1,2969 @@
+<!doctype html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Post UA Service</title>
+  <style>
+    :root {
+      --yellow: #d6b300;
+      --yellow-dark: #b99600;
+      --yellow-soft: #fff7d1;
+      --yellow-rgb: 214, 179, 0;
+      --button-yellow: #dfc13a;
+      --button-yellow-hover: #d3b423;
+      --button-text: #252525;
+      --hover-surface: #fffdf5;
+      --hover-accent: rgba(214, 179, 0, 0.12);
+      --hover-border: rgba(214, 179, 0, 0.42);
+      --hover-shadow: 0 10px 24px rgba(15, 23, 42, 0.075);
+      --ink: #161616;
+      --muted: #667085;
+      --line: #e7e7e7;
+      --soft: #f8f8f8;
+      --green: #4caf50;
+      --shadow: 0 14px 42px rgba(15, 23, 42, 0.12);
+      --radius: 8px;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: #fff;
+      letter-spacing: 0;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button,
+    input,
+    textarea,
+    select {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .page {
+      overflow: hidden;
+      background: linear-gradient(90deg, #ffffff 0%, #f8fafc 55%, #f3f6f8 100%);
+    }
+
+    .container {
+      width: min(1180px, calc(100% - 48px));
+      margin: 0 auto;
+    }
+
+    .site-header {
+      position: relative;
+      z-index: 10;
+      background: rgba(255, 255, 255, 0.95);
+      border-bottom: 1px solid rgba(231, 231, 231, 0.65);
+    }
+
+    .header-inner {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 34px;
+      min-height: 78px;
+    }
+
+    .logo {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 118px;
+      line-height: 1;
+    }
+
+    .logo-img {
+      display: block;
+      width: 86px;
+      height: auto;
+    }
+
+    .site-footer .logo-img {
+      width: 64px;
+    }
+
+    .site-footer .logo {
+      min-width: 0;
+      justify-content: flex-start;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex: 1;
+      gap: 36px;
+      color: #242424;
+      font-size: 14px;
+      font-weight: 650;
+      white-space: nowrap;
+    }
+
+    .menu-toggle {
+      display: none;
+      width: 44px;
+      height: 44px;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 auto;
+      border: 1px solid #dfe3ea;
+      border-radius: 6px;
+      background: #fff;
+      color: #202020;
+      box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06);
+    }
+
+    .menu-toggle-lines {
+      display: grid;
+      gap: 5px;
+      width: 20px;
+    }
+
+    .menu-toggle-lines span {
+      display: block;
+      height: 2px;
+      border-radius: 2px;
+      background: currentColor;
+      transition: transform 160ms ease, opacity 160ms ease;
+    }
+
+    .menu-toggle[aria-expanded="true"] .menu-toggle-lines span:nth-child(1) {
+      transform: translateY(7px) rotate(45deg);
+    }
+
+    .menu-toggle[aria-expanded="true"] .menu-toggle-lines span:nth-child(2) {
+      opacity: 0;
+    }
+
+    .menu-toggle[aria-expanded="true"] .menu-toggle-lines span:nth-child(3) {
+      transform: translateY(-7px) rotate(-45deg);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      margin-left: auto;
+      white-space: nowrap;
+    }
+
+    .phone-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      font-size: 15px;
+      font-weight: 800;
+    }
+
+    .icon {
+      display: inline-flex;
+      width: 22px;
+      height: 22px;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 auto;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      min-height: 44px;
+      padding: 0 24px;
+      border: 1px solid rgba(185, 150, 0, 0.42);
+      border-radius: 6px;
+      font-weight: 800;
+      color: var(--button-text);
+      background: linear-gradient(180deg, #ead36a 0%, var(--button-yellow) 100%);
+      text-shadow: 0 1px 0 rgba(255, 255, 255, 0.28);
+      box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.12);
+      transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease, border-color 160ms ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      border-color: rgba(169, 136, 0, 0.58);
+      background: linear-gradient(180deg, #e6cd55 0%, var(--button-yellow-hover) 100%);
+      box-shadow: 0 7px 16px rgba(var(--yellow-rgb), 0.18), inset 0 -1px 0 rgba(0, 0, 0, 0.12);
+    }
+
+    .btn-outline {
+      background: #fff;
+      border-color: #767676;
+      box-shadow: none;
+    }
+
+    .btn-outline:hover {
+      background: #fbfbfb;
+      box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+    }
+
+    .hero {
+      position: relative;
+      padding: 34px 0 104px;
+      min-height: 500px;
+    }
+
+    .hero-inner {
+      position: relative;
+      display: grid;
+      grid-template-columns: minmax(420px, 0.92fr) minmax(430px, 1fr);
+      align-items: center;
+      gap: 34px;
+    }
+
+    .hero-copy {
+      position: relative;
+      z-index: 3;
+      padding-top: 16px;
+    }
+
+    .hero h1 {
+      max-width: 620px;
+      margin: 0;
+      font-size: clamp(35px, 4vw, 52px);
+      line-height: 1.08;
+      letter-spacing: 0;
+      font-weight: 900;
+    }
+
+    .hero p {
+      max-width: 525px;
+      margin: 22px 0 0;
+      color: #303846;
+      font-size: 17px;
+      line-height: 1.65;
+      font-weight: 500;
+    }
+
+    .hero-features {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 28px;
+      max-width: 525px;
+      margin-top: 34px;
+    }
+
+    .feature {
+      display: grid;
+      grid-template-columns: 48px 1fr;
+      gap: 12px;
+      align-items: center;
+      min-width: 0;
+    }
+
+    .feature .feature-icon {
+      width: 48px;
+      height: 48px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid var(--yellow);
+      border-radius: 50%;
+      color: var(--yellow-dark);
+      background: var(--yellow-soft);
+    }
+
+    .feature .feature-icon svg {
+      width: 24px;
+      height: 24px;
+      display: block;
+    }
+
+    .feature strong,
+    .mini-title {
+      display: block;
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .feature-text {
+      display: block;
+      min-width: 0;
+    }
+
+    .feature-text span {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+      font-weight: 600;
+    }
+
+    .hero-art {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      min-height: 470px;
+      max-height: 520px;
+      aspect-ratio: 1.08 / 1;
+      margin: 0;
+      overflow: hidden;
+      border-radius: 8px;
+      background: transparent;
+    }
+
+    .hero-original-img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+      object-position: 58% center;
+      transform: scale(1.02);
+    }
+
+    .hero-art::before {
+      display: none;
+    }
+
+    .hero-art::after {
+      display: none;
+    }
+
+    .hero-art svg {
+      display: none;
+    }
+
+    .booking {
+      position: relative;
+      z-index: 4;
+      margin-top: -58px;
+    }
+
+    .booking-card,
+    .result-panel,
+    .contact-panel {
+      background: rgba(255, 255, 255, 0.98);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .booking-card {
+      overflow: hidden;
+    }
+
+    .tabs {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      min-height: 56px;
+      border-bottom: 1px solid var(--line);
+      background: #fff;
+    }
+
+    .tab {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      border: 0;
+      background: transparent;
+      color: #202020;
+      padding: 0 10px;
+      font-weight: 750;
+    }
+
+    .tab-step {
+      width: 23px;
+      height: 23px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      background: #f2f4f7;
+      color: #667085;
+      font-size: 11px;
+      font-weight: 900;
+      line-height: 1;
+      transition: background 160ms ease, color 160ms ease;
+    }
+
+    .tab[aria-selected="true"] .tab-step {
+      background: var(--yellow);
+      color: var(--button-text);
+    }
+
+    .tab[aria-selected="true"]::after {
+      content: "";
+      position: absolute;
+      left: 14%;
+      right: 14%;
+      bottom: -1px;
+      height: 3px;
+      background: var(--yellow);
+      border-radius: 3px 3px 0 0;
+    }
+
+    .booking-body {
+      position: relative;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 208px;
+      margin: 0 16px 16px;
+      overflow: hidden;
+      border: 1px solid #e5e8ed;
+      border-radius: 8px;
+      background: #fff;
+    }
+
+    .booking-panel {
+      display: none;
+    }
+
+    .booking-panel.is-active {
+      display: grid;
+    }
+
+    .booking-body.booking-body-single {
+      grid-template-columns: minmax(0, 1fr) minmax(280px, 0.82fr);
+    }
+
+    .route-form {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 28px 58px 28px;
+    }
+
+    .route-form .field + .field {
+      margin-top: 16px;
+    }
+
+    .route-form + .route-form {
+      border-left: 1px solid var(--line);
+    }
+
+    .stage-note {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 10px;
+      padding: 28px 34px;
+      border-left: 1px solid var(--line);
+      background: #fbfcfd;
+    }
+
+    .stage-note strong {
+      color: var(--yellow-dark);
+      font-size: 13px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .stage-note h3 {
+      margin: 0;
+      font-size: 21px;
+      line-height: 1.2;
+    }
+
+    .stage-note p {
+      margin: 0;
+      color: #475467;
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    .booking-body.reverse .route-form[data-route="ie-ua"] {
+      order: 3;
+      border-left: 1px solid var(--line);
+    }
+
+    .booking-body.reverse .route-form[data-route="ua-ie"] {
+      order: 1;
+      border-left: 0;
+    }
+
+    .route-heading {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 0 0 17px;
+      font-size: 22px;
+      line-height: 1.2;
+      font-weight: 900;
+    }
+
+    .flag {
+      display: inline-grid;
+      width: 26px;
+      height: 18px;
+      overflow: hidden;
+      border-radius: 2px;
+      box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08);
+      flex: 0 0 auto;
+    }
+
+    .flag-ie {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .flag-ie span:nth-child(1) { background: #169b62; }
+    .flag-ie span:nth-child(2) { background: #fff; }
+    .flag-ie span:nth-child(3) { background: #ff883e; }
+
+    .flag-ua {
+      grid-template-rows: repeat(2, 1fr);
+    }
+
+    .flag-ua span:nth-child(1) { background: #0057b8; }
+    .flag-ua span:nth-child(2) { background: #ffd700; }
+
+    .field {
+      display: grid;
+      gap: 10px;
+      color: #262626;
+      font-size: 14px;
+      font-weight: 650;
+      width: min(395px, 100%);
+    }
+
+    .field input,
+    .field select,
+    .field textarea {
+      width: 100%;
+      min-height: 46px;
+      border: 1px solid #c9cdd2;
+      border-radius: 5px;
+      padding: 0 15px;
+      color: #222;
+      background: #fff;
+      outline: none;
+      transition: border 160ms ease, box-shadow 160ms ease;
+    }
+
+    .field input::placeholder,
+    .field textarea::placeholder {
+      color: #a0a7b2;
+    }
+
+    .field textarea {
+      min-height: 82px;
+      padding-top: 14px;
+      resize: vertical;
+    }
+
+    .field input:focus,
+    .field select:focus,
+    .field textarea:focus {
+      border-color: var(--yellow-dark);
+      box-shadow: 0 0 0 3px rgba(var(--yellow-rgb), 0.18);
+    }
+
+    .route-form .btn {
+      width: min(295px, 100%);
+      margin-top: 22px;
+    }
+
+    .swap {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 54px;
+      height: 54px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #e3e6ea;
+      border-radius: 50%;
+      background: #fff;
+      color: var(--yellow-dark);
+      transform: translate(-50%, -50%);
+      box-shadow: 0 8px 22px rgba(15, 23, 42, 0.11);
+      transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+    }
+
+    .swap:hover {
+      border-color: rgba(var(--yellow-rgb), 0.45);
+      transform: translate(-50%, -50%) scale(1.03);
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.14);
+    }
+
+    .swap svg {
+      width: 28px;
+      height: 28px;
+    }
+
+    .result-panel {
+      display: grid;
+      grid-template-columns: 1fr 1.25fr 260px;
+      gap: 26px;
+      align-items: center;
+      margin-top: 18px;
+      padding: 22px 18px 22px 26px;
+      border-color: #63c466;
+      box-shadow: none;
+    }
+
+    .result-status {
+      display: grid;
+      grid-template-columns: 72px 1fr;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .check-circle {
+      width: 72px;
+      height: 72px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid var(--green);
+      border-radius: 50%;
+      color: var(--green);
+    }
+
+    .result-status h2,
+    .section-title,
+    .contact-panel h2 {
+      margin: 0;
+      font-size: 25px;
+      line-height: 1.2;
+      font-weight: 900;
+    }
+
+    .result-status p {
+      margin: 6px 0 0;
+      font-size: 17px;
+    }
+
+    .next-steps h3 {
+      margin: 0 0 10px;
+      font-size: 17px;
+      font-weight: 900;
+    }
+
+    .next-steps ol {
+      display: grid;
+      gap: 8px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      color: #394150;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .next-steps li {
+      display: grid;
+      grid-template-columns: 20px 1fr;
+      gap: 10px;
+      align-items: start;
+    }
+
+    .step-number {
+      width: 18px;
+      height: 18px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      color: #fff;
+      background: var(--green);
+      font-size: 11px;
+      font-weight: 900;
+    }
+
+    .result-actions {
+      display: grid;
+      gap: 14px;
+    }
+
+    .result-actions .btn {
+      width: 100%;
+    }
+
+    .section {
+      padding: 42px 0 0;
+    }
+
+    .section-head {
+      margin-bottom: 22px;
+    }
+
+    .section-title::after,
+    .contact-panel h2::after {
+      content: "";
+      display: block;
+      width: 40px;
+      height: 3px;
+      margin-top: 14px;
+      border-radius: 3px;
+      background: var(--yellow);
+    }
+
+    .why-section {
+      margin-top: 42px;
+      padding: 48px 0;
+      background: linear-gradient(180deg, #f7f8fa 0%, #fff 100%);
+      border-top: 1px solid #e6e9ef;
+      border-bottom: 1px solid #e6e9ef;
+    }
+
+    .why {
+      display: grid;
+      grid-template-columns: minmax(300px, 0.9fr) minmax(0, 1.45fr);
+      gap: 42px;
+      align-items: center;
+    }
+
+    .why-copy {
+      max-width: 440px;
+    }
+
+    .why p {
+      margin: 0;
+      color: #475467;
+      font-size: 14px;
+      line-height: 1.65;
+      font-weight: 550;
+    }
+
+    .trust-badge {
+      width: fit-content;
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      margin-top: 22px;
+      padding: 9px 13px;
+      border: 1px solid rgba(var(--yellow-rgb), 0.38);
+      border-radius: 999px;
+      background: #fff;
+      color: #303846;
+      font-size: 13px;
+      font-weight: 800;
+      box-shadow: 0 8px 22px rgba(15, 23, 42, 0.06);
+      transition: opacity 160ms ease, border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+    }
+
+    .trust-badge.is-changing {
+      opacity: 0.64;
+    }
+
+    .trust-badge::before {
+      content: "";
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--yellow);
+      box-shadow: 0 0 0 5px var(--yellow-soft);
+      animation: trustPulse 4.8s ease-in-out infinite;
+    }
+
+    .trust-route {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 10px;
+      margin-top: 28px;
+      color: #667085;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+    }
+
+    .route-point {
+      position: relative;
+      width: 38px;
+      height: 38px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(var(--yellow-rgb), 0.42);
+      border-radius: 50%;
+      background: #fff;
+      color: var(--button-text);
+      box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06);
+      transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+      animation: routePointPulse 5.4s ease-in-out infinite;
+    }
+
+    .route-point:last-child {
+      animation-delay: 1.35s;
+    }
+
+    .route-line {
+      position: relative;
+      height: 2px;
+      background: repeating-linear-gradient(90deg, rgba(var(--yellow-rgb), 0.95) 0 9px, transparent 9px 15px);
+      background-size: 30px 2px;
+      animation: routeFlow 9s linear infinite;
+    }
+
+    .route-line::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 0;
+      width: 21px;
+      height: 15px;
+      border: 1px solid rgba(142, 108, 24, 0.42);
+      border-radius: 3px;
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.5) 0 12%, transparent 12% 100%),
+        linear-gradient(90deg, transparent 0 46%, rgba(142, 108, 24, 0.25) 46% 54%, transparent 54%),
+        linear-gradient(180deg, #d2a85f 0%, #bc8740 100%);
+      box-shadow: 0 7px 14px rgba(92, 64, 28, 0.18);
+      transform: translate(-50%, -50%);
+      animation: routeParcel 14s ease-in-out infinite alternate;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .stat-card,
+    .review-card,
+    .work-step {
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+    }
+
+    .stat-card {
+      position: relative;
+      min-height: 154px;
+      padding: 22px 18px 18px;
+      text-align: left;
+      border-color: #e0e4ea;
+      border-radius: 8px;
+      box-shadow: 0 10px 26px rgba(15, 23, 42, 0.06);
+      overflow: hidden;
+      transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+    }
+
+    .stat-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 18px;
+      right: 18px;
+      height: 3px;
+      border-radius: 0 0 3px 3px;
+      background: var(--yellow);
+      transition: left 180ms ease, right 180ms ease, height 180ms ease, background 180ms ease;
+    }
+
+    .stat-value {
+      display: block;
+      margin-bottom: 10px;
+      color: var(--button-text);
+      font-size: 30px;
+      line-height: 1;
+      font-weight: 900;
+      transition: color 180ms ease, transform 180ms ease;
+    }
+
+    .stat-card strong {
+      display: block;
+      max-width: none;
+      color: #303846;
+      font-size: 16px;
+      line-height: 1.25;
+      font-weight: 850;
+    }
+
+    .stat-card span:not(.stat-value) {
+      display: block;
+      margin-top: 8px;
+      color: #475467;
+      font-size: 13px;
+      line-height: 1.48;
+      font-weight: 550;
+    }
+
+    .reviews-wrap {
+      position: relative;
+      padding: 0 38px;
+    }
+
+    .reviews-viewport {
+      overflow: hidden;
+      margin: -8px 0 -12px;
+      padding: 8px 0 12px;
+    }
+
+    .reviews {
+      --review-card-width: calc((100% - 32px) / 3);
+      display: flex;
+      gap: 16px;
+      transition: transform 280ms ease;
+      will-change: transform;
+    }
+
+    .review-card {
+      flex: 0 0 var(--review-card-width);
+      padding: 18px 18px 20px;
+      min-height: 168px;
+      border-color: #dfe3ea;
+      box-shadow: none;
+      transition: background 180ms ease, border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+    }
+
+    .review-card.is-active {
+      border-color: rgba(var(--yellow-rgb), 0.5);
+      box-shadow: 0 10px 26px rgba(15, 23, 42, 0.08);
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      .review-card:hover {
+        transform: translateY(-4px);
+        border-color: var(--hover-border);
+        background: var(--hover-surface);
+        box-shadow: var(--hover-shadow);
+      }
+    }
+
+    .review-top {
+      display: grid;
+      grid-template-columns: 52px 1fr;
+      gap: 14px;
+      align-items: center;
+    }
+
+    .avatar {
+      width: 52px;
+      height: 52px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      overflow: hidden;
+      background: #f4e5a7;
+      box-shadow: 0 0 0 3px #fff, 0 0 0 4px rgba(var(--yellow-rgb), 0.22);
+    }
+
+    .avatar img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+    }
+
+    .review-top strong {
+      display: block;
+      font-size: 15px;
+      font-weight: 900;
+    }
+
+    .review-top span {
+      display: block;
+      margin-top: 3px;
+      color: #667085;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .stars {
+      margin-top: 4px;
+      color: var(--yellow-dark);
+      font-size: 15px;
+      letter-spacing: 1px;
+    }
+
+    .review-card p {
+      margin: 17px 0 0;
+      color: #344054;
+      font-size: 13px;
+      line-height: 1.55;
+      font-weight: 550;
+    }
+
+    .slider-btn {
+      position: absolute;
+      top: 50%;
+      width: 34px;
+      height: 34px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      background: #fff;
+      color: #222;
+      transform: translateY(-50%);
+      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+    }
+
+    .slider-btn.prev { left: 0; }
+    .slider-btn.next { right: 0; }
+
+    .dots {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .dot {
+      width: 7px;
+      height: 7px;
+      padding: 0;
+      border: 0;
+      border-radius: 50%;
+      background: #d5d7dc;
+      cursor: pointer;
+    }
+
+    .dot.active,
+    .dot[aria-current="true"] {
+      background: var(--yellow-dark);
+    }
+
+    .dot:focus-visible {
+      outline: 2px solid rgba(var(--yellow-rgb), 0.55);
+      outline-offset: 3px;
+    }
+
+    .work-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 78px;
+      position: relative;
+    }
+
+    .work-grid::before {
+      content: none;
+    }
+
+    .work-step {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 74px 1fr;
+      gap: 18px;
+      align-items: start;
+      min-height: 190px;
+      padding: 18px 18px;
+      border-color: #dfe3ea;
+      box-shadow: none;
+      transition: border-color 180ms ease, box-shadow 180ms ease;
+    }
+
+    .work-step:not(:last-child)::after {
+      content: "";
+      position: absolute;
+      top: 56px;
+      left: calc(100% + 14px);
+      width: 50px;
+      border-top: 2px dashed #d2d6dd;
+    }
+
+    .work-step strong {
+      display: block;
+      margin-bottom: 7px;
+      font-size: 14px;
+      font-weight: 900;
+    }
+
+    .work-step p {
+      margin: 0;
+      color: #475467;
+      font-size: 12.5px;
+      line-height: 1.42;
+      font-weight: 550;
+    }
+
+    .work-list {
+      display: grid;
+      gap: 8px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      color: #475467;
+      font-size: 12.5px;
+      line-height: 1.42;
+      font-weight: 550;
+    }
+
+    .work-list li {
+      position: relative;
+      padding-left: 14px;
+    }
+
+    .work-list li::before {
+      content: "";
+      position: absolute;
+      top: 0.62em;
+      left: 0;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--yellow);
+      transform: translateY(-50%);
+    }
+
+    .work-list a {
+      color: #202020;
+      font-weight: 800;
+    }
+
+    .work-visual {
+      position: relative;
+      width: 66px;
+      min-height: 148px;
+      display: grid;
+      justify-items: center;
+      align-content: start;
+      margin-top: 1px;
+    }
+
+    .work-visual::before {
+      content: "";
+      position: absolute;
+      top: 48px;
+      bottom: 10px;
+      left: 50%;
+      width: 2px;
+      background: repeating-linear-gradient(to bottom, rgba(var(--yellow-rgb), 0.95) 0 7px, transparent 7px 13px);
+      transform: translateX(-50%);
+      transition: opacity 180ms ease, filter 180ms ease;
+    }
+
+    .work-visual::after {
+      content: "";
+      position: absolute;
+      top: 4px;
+      left: 50%;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: var(--hover-accent);
+      opacity: 0;
+      transform: translateX(-50%) scale(0.82);
+      transition: opacity 180ms ease, transform 180ms ease;
+    }
+
+    .work-step-number {
+      position: relative;
+      z-index: 1;
+      width: 58px;
+      height: 48px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid var(--yellow);
+      border-radius: 8px;
+      background: linear-gradient(180deg, #fffdf5 0%, var(--yellow-soft) 100%);
+      color: var(--button-text);
+      font-size: 20px;
+      line-height: 1;
+      font-weight: 900;
+      box-shadow: 0 8px 18px rgba(var(--yellow-rgb), 0.18);
+      transition: transform 180ms ease, background 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+    }
+
+    .work-step-number::before {
+      content: "крок";
+      position: absolute;
+      top: -9px;
+      left: 50%;
+      padding: 0 6px;
+      background: #fff;
+      color: #667085;
+      font-size: 9px;
+      line-height: 1;
+      font-weight: 800;
+      text-transform: uppercase;
+      transform: translateX(-50%);
+      transition: color 180ms ease;
+    }
+
+    .work-route-dots {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      gap: 17px;
+      margin-top: 18px;
+    }
+
+    .work-route-dots span {
+      width: 13px;
+      height: 13px;
+      border: 3px solid var(--yellow);
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 0 0 5px #fff;
+      transition: transform 180ms ease, border-color 180ms ease, background 180ms ease, box-shadow 180ms ease;
+    }
+
+    .work-route-dots span.is-active {
+      background: var(--yellow);
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      .work-step:hover {
+        border-color: var(--hover-border);
+        background: var(--hover-surface);
+        box-shadow: var(--hover-shadow);
+      }
+
+      .work-step:hover .work-visual::before {
+        opacity: 0.9;
+        filter: drop-shadow(0 0 5px rgba(var(--yellow-rgb), 0.28));
+      }
+
+      .work-step:hover .work-visual::after {
+        opacity: 1;
+        transform: translateX(-50%) scale(1);
+      }
+
+      .work-step:hover .work-step-number {
+        transform: translateY(-3px);
+        border-color: var(--hover-border);
+        background: linear-gradient(180deg, var(--hover-surface) 0%, var(--yellow-soft) 100%);
+        box-shadow: 0 10px 22px rgba(var(--yellow-rgb), 0.18);
+      }
+
+      .work-step:hover .work-step-number::before {
+        color: var(--yellow-dark);
+      }
+
+      .work-step:hover .work-route-dots span {
+        transform: scale(1.08);
+        border-color: var(--hover-border);
+        box-shadow: 0 0 0 5px #fff, 0 7px 14px rgba(var(--yellow-rgb), 0.16);
+      }
+
+      .work-step:hover .work-route-dots span.is-active {
+        transform: scale(1.22);
+        background: var(--yellow);
+        box-shadow: 0 0 0 5px #fff, 0 8px 18px rgba(var(--yellow-rgb), 0.18);
+      }
+    }
+
+    .faq-block {
+      display: grid;
+      grid-template-columns: minmax(240px, 0.72fr) minmax(0, 1.8fr);
+      gap: 42px;
+      align-items: start;
+    }
+
+    .faq-intro {
+      max-width: 380px;
+      margin: 14px 0 0;
+      color: #475467;
+      font-size: 14px;
+      line-height: 1.65;
+      font-weight: 550;
+    }
+
+    .faq-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .faq-item {
+      min-width: 0;
+      overflow: hidden;
+      border: 1px solid #dfe3ea;
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: 0 8px 22px rgba(15, 23, 42, 0.05);
+      transition: border-color 160ms ease, box-shadow 160ms ease, background 160ms ease, transform 160ms ease;
+    }
+
+    .faq-item[open] {
+      border-color: rgba(var(--yellow-rgb), 0.55);
+      box-shadow: 0 10px 26px rgba(15, 23, 42, 0.08);
+    }
+
+    .faq-item summary {
+      position: relative;
+      min-height: 62px;
+      display: flex;
+      align-items: center;
+      padding: 16px 48px 16px 18px;
+      color: #303846;
+      cursor: pointer;
+      list-style: none;
+      font-size: 14px;
+      line-height: 1.32;
+      font-weight: 800;
+      transition: color 160ms ease;
+    }
+
+    .faq-item summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .faq-item summary::after {
+      content: "+";
+      position: absolute;
+      top: 50%;
+      right: 16px;
+      width: 24px;
+      height: 24px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: var(--yellow-soft);
+      color: var(--yellow-dark);
+      font-size: 18px;
+      line-height: 1;
+      font-weight: 900;
+      transform: translateY(-50%);
+      transition: background 160ms ease, color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+    }
+
+    .faq-item[open] summary::after {
+      content: "-";
+    }
+
+    .faq-item p {
+      margin: 0;
+      padding: 0 18px 17px;
+      color: #475467;
+      font-size: 13px;
+      line-height: 1.55;
+      font-weight: 550;
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      .faq-item:not([open]):hover {
+        transform: translateY(-2px);
+        border-color: var(--hover-border);
+        background: var(--hover-surface);
+        box-shadow: var(--hover-shadow);
+      }
+
+      .faq-item:not([open]):hover summary {
+        color: #202020;
+      }
+
+      .faq-item:not([open]):hover summary::after {
+        background: var(--yellow-soft);
+        color: var(--button-text);
+        transform: translateY(-50%) scale(1.06);
+        box-shadow: 0 7px 15px rgba(var(--yellow-rgb), 0.18);
+      }
+    }
+
+    .contact-panel {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      align-items: stretch;
+      overflow: hidden;
+    }
+
+    .question-form,
+    .contact-info {
+      min-width: 0;
+      min-height: 360px;
+      padding: 30px 30px 28px;
+    }
+
+    .question-form {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .contact-info {
+      position: relative;
+      display: grid;
+      grid-template-columns: minmax(215px, 1fr) minmax(0, 1fr);
+      grid-template-rows: auto 1fr;
+      column-gap: 24px;
+      align-items: start;
+      padding: 18px;
+      border-left: 1px solid var(--line);
+      overflow: hidden;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px 20px;
+      width: 100%;
+      margin-top: 20px;
+    }
+
+    .form-grid .field {
+      width: 100%;
+      min-width: 0;
+    }
+
+    .form-grid .wide,
+    .question-form .btn,
+    .privacy {
+      grid-column: 1 / -1;
+    }
+
+    .question-form .btn {
+      width: 100%;
+      margin-top: 0;
+    }
+
+    .privacy {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #667085;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .contact-info h2 {
+      position: relative;
+      grid-column: 1;
+      grid-row: 1;
+      z-index: 2;
+    }
+
+    .contact-list {
+      display: grid;
+      gap: 13px;
+      margin-top: 20px;
+      color: #202020;
+      font-size: 14px;
+      font-weight: 700;
+      width: 100%;
+      min-width: 0;
+      position: relative;
+      grid-column: 1;
+      grid-row: 2;
+      z-index: 2;
+    }
+
+    .contact-row,
+    .messengers {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .contact-row {
+      width: fit-content;
+      padding: 7px 8px;
+      margin: -7px -8px;
+      border-radius: 8px;
+      transition: color 160ms ease, background 160ms ease, transform 160ms ease;
+    }
+
+    .contact-row svg {
+      color: var(--yellow-dark);
+      transition: transform 160ms ease, color 160ms ease;
+    }
+
+    .messenger {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: #344054;
+      font-size: 13px;
+      font-weight: 700;
+      border-radius: 999px;
+      transition: color 160ms ease, transform 160ms ease;
+    }
+
+    .messenger-dot {
+      width: 30px;
+      height: 30px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 auto;
+      border: 1px solid rgba(var(--yellow-rgb), 0.45);
+      border-radius: 50%;
+      background: var(--yellow-soft);
+      color: var(--yellow-dark);
+      transition: background 160ms ease, border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+    }
+
+    .messenger-dot svg {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+      stroke: none;
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      .contact-row:hover {
+        color: var(--button-text);
+        background: var(--hover-surface);
+        transform: translateX(3px);
+      }
+
+      .contact-row:hover svg {
+        color: var(--button-text);
+        transform: scale(1.08);
+      }
+
+      .messenger:hover {
+        color: var(--button-text);
+        transform: translateY(-2px);
+      }
+
+      .messenger:hover .messenger-dot {
+        border-color: var(--hover-border);
+        background: var(--hover-surface);
+        box-shadow: 0 8px 16px rgba(var(--yellow-rgb), 0.18);
+        transform: scale(1.06);
+      }
+    }
+
+    .contact-art {
+      position: relative;
+      right: auto;
+      bottom: auto;
+      z-index: 1;
+      display: block;
+      grid-column: 2;
+      grid-row: 1 / 3;
+      width: 100%;
+      height: 100%;
+      min-width: 0;
+      min-height: 0;
+      margin: 0;
+      justify-self: stretch;
+      align-self: stretch;
+      border: 1px solid rgba(223, 227, 234, 0.9);
+      border-radius: 18px;
+      box-shadow: 0 14px 32px rgba(15, 23, 42, 0.1);
+      object-fit: cover;
+      object-position: center;
+      opacity: 0.96;
+    }
+
+    .site-footer {
+      margin-top: 48px;
+      background: #eef2f6;
+      border-top: 1px solid #d9dee7;
+    }
+
+    .footer-main {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr 1fr 1.2fr;
+      gap: 54px;
+      padding: 42px 0 32px;
+    }
+
+    .footer-copy {
+      margin: 14px 0 10px;
+      color: #475467;
+      font-size: 13px;
+      line-height: 1.55;
+      font-weight: 550;
+    }
+
+    .footer-note {
+      margin: 0;
+      color: #667085;
+      font-size: 12px;
+      line-height: 1.5;
+      font-weight: 600;
+    }
+
+    .footer-brand {
+      display: grid;
+      align-content: start;
+      justify-items: start;
+    }
+
+    .footer-col h3 {
+      margin: 0 0 15px;
+      font-size: 15px;
+      font-weight: 900;
+    }
+
+    .footer-col ul {
+      display: grid;
+      gap: 10px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      color: #3f4653;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .footer-col {
+      min-width: 0;
+    }
+
+    .footer-contact-row {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+
+    .footer-contact-row svg {
+      width: 16px;
+      height: 16px;
+      flex: 0 0 auto;
+      color: var(--button-text);
+    }
+
+    .footer-messengers {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      padding-top: 2px;
+    }
+
+    .footer-messenger {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      color: #344054;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .footer-messenger-icon {
+      width: 28px;
+      height: 28px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 auto;
+      border: 1px solid #d9dee7;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.72);
+      color: var(--button-text);
+    }
+
+    .footer-messenger-icon svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    .footer-messenger-icon .icon-fill {
+      fill: currentColor;
+      stroke: none;
+    }
+
+    .footer-messenger-icon .icon-line {
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    @keyframes routeFlow {
+      from {
+        background-position: 0 0;
+      }
+
+      to {
+        background-position: 30px 0;
+      }
+    }
+
+    @keyframes routeParcel {
+      0% {
+        left: 0;
+        transform: translate(-50%, -50%) scale(0.94);
+      }
+
+      12%,
+      88% {
+        transform: translate(-50%, -50%) scale(1);
+      }
+
+      100% {
+        left: 100%;
+        transform: translate(-50%, -50%) scale(0.94);
+      }
+    }
+
+    @keyframes trustPulse {
+      0%,
+      100% {
+        box-shadow: 0 0 0 5px var(--yellow-soft);
+      }
+
+      50% {
+        box-shadow: 0 0 0 8px rgba(var(--yellow-rgb), 0.14);
+      }
+    }
+
+    @keyframes routePointPulse {
+      0%,
+      100% {
+        filter: drop-shadow(0 0 0 rgba(var(--yellow-rgb), 0));
+      }
+
+      50% {
+        filter: drop-shadow(0 0 7px rgba(var(--yellow-rgb), 0.18));
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .trust-badge::before,
+      .route-point,
+      .route-line,
+      .route-line::after {
+        animation: none;
+      }
+    }
+
+    @media (max-width: 1060px) {
+      .header-inner {
+        gap: 18px;
+      }
+
+      .nav {
+        gap: 18px;
+        font-size: 13px;
+      }
+
+      .hero-inner {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-art {
+        margin: 10px 0 0;
+        min-height: 420px;
+        max-height: none;
+        aspect-ratio: 1.35 / 1;
+        border-radius: 8px;
+      }
+
+      .booking {
+        margin-top: 24px;
+      }
+
+      .why,
+      .faq-block,
+      .contact-panel,
+      .result-panel {
+        grid-template-columns: 1fr;
+      }
+
+      .result-actions {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .stats,
+      .faq-list {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .reviews {
+        --review-card-width: calc((100% - 16px) / 2);
+      }
+
+      .why-copy {
+        max-width: 620px;
+      }
+
+      .work-grid {
+        grid-template-columns: 1fr;
+        gap: 22px;
+      }
+
+      .work-grid::before {
+        display: none;
+      }
+
+      .work-step:not(:last-child)::after {
+        display: none;
+      }
+
+      .work-step {
+        grid-template-columns: 74px 1fr;
+      }
+
+      .contact-info {
+        border-left: 0;
+        border-top: 1px solid var(--line);
+      }
+
+      .footer-main {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 820px) {
+      .container {
+        width: min(100% - 30px, 680px);
+      }
+
+      .header-inner {
+        flex-wrap: nowrap;
+        gap: 12px;
+        min-height: auto;
+        padding: 16px 0;
+      }
+
+      .logo {
+        min-width: 0;
+        margin-right: auto;
+        justify-content: flex-start;
+      }
+
+      .nav {
+        position: absolute;
+        order: 4;
+        z-index: 30;
+        top: calc(100% + 10px);
+        left: 0;
+        right: 0;
+        display: none;
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #e0e4ea;
+        border-radius: 8px;
+        background: #fff;
+        box-shadow: 0 18px 40px rgba(15, 23, 42, 0.14);
+        text-align: left;
+        white-space: normal;
+      }
+
+      .nav.is-open {
+        display: grid;
+        gap: 4px;
+      }
+
+      .nav a {
+        display: block;
+        padding: 13px 14px;
+        border-radius: 6px;
+      }
+
+      .nav a:hover {
+        background: var(--yellow-soft);
+      }
+
+      .menu-toggle {
+        display: inline-flex;
+        order: 3;
+      }
+
+      .header-actions {
+        order: 2;
+        gap: 14px;
+        margin-left: 0;
+      }
+
+      .phone-link {
+        width: 44px;
+        height: 44px;
+        justify-content: center;
+        gap: 0;
+        border: 1px solid #dfe3ea;
+        border-radius: 6px;
+        background: #fff;
+        box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06);
+      }
+
+      .phone-link span:last-child {
+        display: none;
+      }
+
+      .hero {
+        padding-top: 22px;
+      }
+
+      .hero-art {
+        min-height: 320px;
+        aspect-ratio: 4 / 3;
+      }
+
+      .hero-original-img {
+        object-position: 58% center;
+      }
+
+      .hero-features,
+      .tabs,
+      .booking-body,
+      .work-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .booking-body.booking-body-single {
+        grid-template-columns: 1fr;
+      }
+
+      .feature {
+        grid-template-columns: 48px 1fr;
+      }
+
+      .route-form {
+        padding: 24px;
+      }
+
+      .booking-panel:not(.reverse) .route-form + .route-form {
+        border-left: 0;
+        border-top: 1px solid var(--line);
+      }
+
+      .route-form[data-route="ie-ua"] {
+        order: 1;
+      }
+
+      .route-form[data-route="ua-ie"] {
+        order: 3;
+        border-left: 0;
+        border-top: 1px solid var(--line);
+      }
+
+      .booking-body.reverse .route-form[data-route="ua-ie"] {
+        order: 1;
+        border-top: 0;
+      }
+
+      .booking-body.reverse .route-form[data-route="ie-ua"] {
+        order: 3;
+        border-left: 0;
+        border-top: 1px solid var(--line);
+      }
+
+      .swap {
+        position: relative;
+        order: 2;
+        top: auto;
+        left: auto;
+        right: auto;
+        justify-self: center;
+        z-index: 2;
+        width: 48px;
+        height: 48px;
+        margin: -24px 0;
+        transform: none;
+      }
+
+      .swap svg {
+        width: 25px;
+        height: 25px;
+        transform: rotate(90deg);
+      }
+
+      .stage-note {
+        border-left: 0;
+        border-top: 1px solid var(--line);
+        padding: 24px;
+      }
+
+      .swap:hover {
+        transform: scale(1.03);
+      }
+
+      .tabs {
+        min-height: auto;
+      }
+
+      .tab {
+        min-height: 48px;
+      }
+
+      .result-actions,
+      .stats,
+      .faq-list,
+      .form-grid,
+      .footer-main {
+        grid-template-columns: 1fr;
+      }
+
+      .reviews {
+        --review-card-width: 100%;
+      }
+
+      .question-form,
+      .contact-info {
+        min-height: auto;
+        padding: 24px;
+      }
+
+      .contact-info {
+        grid-template-columns: 1fr;
+        padding: 18px;
+      }
+
+      .contact-info h2,
+      .contact-list,
+      .contact-art {
+        grid-column: 1;
+        grid-row: auto;
+      }
+
+      .stat-card {
+        min-height: auto;
+        padding: 20px 18px 18px;
+      }
+
+      .stat-card::before {
+        left: 18px;
+        right: 18px;
+      }
+
+      .stat-card strong {
+        font-size: 16px;
+      }
+
+      .stat-value {
+        font-size: 28px;
+      }
+
+      .reviews-wrap {
+        padding: 0;
+      }
+
+      .slider-btn {
+        display: none;
+      }
+
+      .contact-list {
+        width: 100%;
+      }
+
+      .contact-art {
+        position: relative;
+        right: auto;
+        bottom: auto;
+        margin: 18px auto 0;
+        width: 100%;
+        height: 360px;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .header-actions .btn {
+        width: 44px;
+        padding: 0;
+      }
+
+      .header-actions .btn span {
+        display: none;
+      }
+
+      .hero h1 {
+        font-size: 34px;
+      }
+
+      .hero-art {
+        min-height: 260px;
+        aspect-ratio: 1.12 / 1;
+      }
+
+      .hero p {
+        font-size: 15px;
+      }
+
+      .container {
+        width: min(100% - 24px, 680px);
+      }
+
+      .route-heading {
+        font-size: 20px;
+      }
+
+      .result-status {
+        grid-template-columns: 56px 1fr;
+      }
+
+      .check-circle {
+        width: 56px;
+        height: 56px;
+      }
+
+      .messengers {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .contact-art {
+        height: 300px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="site-header">
+      <div class="container header-inner">
+        <a class="logo" href="#" aria-label="Post UA Service">
+          <img class="logo-img" src="post-ua-service-logo.jpg" alt="POST UA Service">
+        </a>
+        <button class="menu-toggle" type="button" aria-controls="primary-nav" aria-expanded="false" aria-label="Відкрити меню">
+          <span class="menu-toggle-lines" aria-hidden="true">
+            <span></span>
+            <span></span>
+            <span></span>
+          </span>
+        </button>
+        <nav class="nav" id="primary-nav" aria-label="Основна навігація">
+          <a href="#private">Ірландія → Україна</a>
+          <a href="#private">Україна → Ірландія</a>
+          <a href="#private">Ірландія → ЄС</a>
+          <a href="#private">Комерційні</a>
+        </nav>
+        <div class="header-actions">
+          <a class="phone-link" href="tel:+353894369474">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M22 16.9v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.18 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.72c.13.96.35 1.9.67 2.8a2 2 0 0 1-.45 2.11L8.1 9.86a16 16 0 0 0 6 6l1.23-1.23a2 2 0 0 1 2.11-.45c.9.32 1.84.54 2.8.67A2 2 0 0 1 22 16.9Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>+353 89 436 94 74</span>
+          </a>
+          <a class="btn" href="#question">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9H13a8.5 8.5 0 0 1 8 8v.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M8 12h.01M12 12h.01M16 12h.01" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/>
+            </svg>
+            <span>Написати нам</span>
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="container hero-inner">
+          <div class="hero-copy">
+            <h1>Доставка посилок між Україною та Ірландією — просто, швидко, надійно</h1>
+            <p>Доставляємо посилки, документи та вантажі між Ірландією, Україною та Європою. Прозорі ціни, зручний сервіс та підтримка на кожному етапі.</p>
+            <div class="hero-features">
+              <div class="feature">
+                <span class="feature-icon">
+                  <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                    <path d="m9 12 2 2 4-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </span>
+                <span class="feature-text"><strong>Надійно</strong><span>Ваші посилки у безпеці</span></span>
+              </div>
+              <div class="feature">
+                <span class="feature-icon">
+                  <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/>
+                    <path d="M12 7v5l3 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </span>
+                <span class="feature-text"><strong>Швидко</strong><span>Оптимальні терміни доставки</span></span>
+              </div>
+              <div class="feature">
+                <span class="feature-icon">
+                  <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M4 14v-2a8 8 0 0 1 16 0v2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M4 14a2 2 0 0 0 2 2h1v-5H6a2 2 0 0 0-2 2v1Zm16 0a2 2 0 0 1-2 2h-1v-5h1a2 2 0 0 1 2 2v1Z" stroke="currentColor" stroke-width="2"/>
+                    <path d="M18 16a4 4 0 0 1-4 4h-2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                  </svg>
+                </span>
+                <span class="feature-text"><strong>Підтримка</strong><span>Ми завжди на зв'язку</span></span>
+              </div>
+            </div>
+          </div>
+          <div class="hero-art" aria-hidden="true">
+            <img class="hero-original-img" src="hero-original.png" alt="">
+            <svg viewBox="0 0 720 360" role="img">
+              <defs>
+                <linearGradient id="sea" x1="0" x2="1" y1="0" y2="1">
+                  <stop offset="0" stop-color="#8ec4d8"/>
+                  <stop offset="1" stop-color="#d8eef6"/>
+                </linearGradient>
+                <linearGradient id="cliff" x1="0" x2="0" y1="0" y2="1">
+                  <stop offset="0" stop-color="#6d7f67"/>
+                  <stop offset="1" stop-color="#3e5149"/>
+                </linearGradient>
+                <filter id="softShadow" x="-20%" y="-20%" width="140%" height="160%">
+                  <feDropShadow dx="0" dy="8" stdDeviation="7" flood-color="#111827" flood-opacity="0.2"/>
+                </filter>
+              </defs>
+              <rect width="720" height="360" fill="#dff1ff"/>
+              <circle cx="126" cy="65" r="36" fill="#fff" opacity=".85"/>
+              <ellipse cx="178" cy="72" rx="84" ry="22" fill="#fff" opacity=".9"/>
+              <ellipse cx="585" cy="54" rx="92" ry="25" fill="#fff" opacity=".9"/>
+              <ellipse cx="646" cy="71" rx="55" ry="18" fill="#fff" opacity=".84"/>
+              <path d="M0 185 C80 160 145 184 228 163 C302 144 374 151 445 176 C525 203 604 184 720 162 L720 360 L0 360Z" fill="#ebf4dd"/>
+              <path d="M0 193 C82 175 130 194 217 177 C306 158 394 160 470 187 C560 220 627 198 720 181 L720 360 L0 360Z" fill="url(#sea)"/>
+              <path d="M0 176 C52 138 117 128 177 143 C226 155 266 149 325 138 L360 212 C256 236 152 238 0 232Z" fill="url(#cliff)"/>
+              <path d="M32 158 C88 171 151 168 200 149 C136 206 87 220 0 217 L0 186Z" fill="#576b58"/>
+              <path d="M0 221 C72 223 146 219 217 199 C258 187 300 192 344 209 L338 360 L0 360Z" fill="#eef4e8"/>
+              <g transform="translate(432 36)">
+                <path d="M61 47v201" stroke="#6b5b43" stroke-width="8"/>
+                <path d="M44 58h34l-3 20H47Z" fill="#b99600"/>
+                <path d="M52 31h18l-3 26H55Z" fill="#a98800"/>
+                <path d="M61 1l8 24 23 6-20 10 3 24-14-16-15 16 3-24-20-10 24-6Z" fill="#6f716e"/>
+                <path d="M47 245h28l12 43H35Z" fill="#5a4e3c"/>
+              </g>
+              <g transform="translate(530 76)">
+                <rect x="25" y="126" width="118" height="75" fill="#f0d8ac"/>
+                <rect x="41" y="98" width="30" height="35" fill="#f3e4c4"/>
+                <rect x="94" y="100" width="33" height="33" fill="#f3e4c4"/>
+                <path d="M40 102 C49 68 62 67 70 102Z" fill="#0f70a9"/>
+                <path d="M92 103 C105 60 120 60 130 103Z" fill="#0f70a9"/>
+                <path d="M62 80h7v-26h-7Z" fill="#a98800"/>
+                <path d="M112 77h7v-34h-7Z" fill="#a98800"/>
+                <path d="M58 54h16l-8-16Z" fill="#b99600"/>
+                <path d="M108 43h16l-8-18Z" fill="#b99600"/>
+                <circle cx="84" cy="101" r="25" fill="#d6b300"/>
+                <path d="M63 104 C67 74 102 74 106 104Z" fill="#0f70a9"/>
+                <rect x="78" y="63" width="10" height="28" fill="#a98800"/>
+                <path d="M72 62h22l-11-21Z" fill="#b99600"/>
+                <path d="M54 139h58" stroke="#b88f4e" stroke-width="3"/>
+              </g>
+              <g filter="url(#softShadow)" transform="translate(206 210)">
+                <path d="M22 28c4-26 22-43 49-43h204c19 0 37 15 40 34l14 88H20Z" fill="#f9fafb"/>
+                <path d="M58 20h131v75H38V47c0-14 7-27 20-27Z" fill="#fff"/>
+                <path d="M191 20h75c18 0 33 14 35 32l5 43H191Z" fill="#f1f3f5"/>
+                <path d="M60 30h52v48H42V48c0-10 8-18 18-18Z" fill="#dbe8f3"/>
+                <rect x="126" y="38" width="84" height="33" rx="4" fill="#fff"/>
+                <text x="142" y="58" font-size="24" font-family="Arial, sans-serif" font-weight="900" fill="#161616">POST UA</text>
+                <text x="164" y="75" font-size="9" font-family="Arial, sans-serif" font-weight="800" letter-spacing="5" fill="#161616">SERVICE</text>
+                <circle cx="121" cy="50" r="17" fill="none" stroke="#d6b300" stroke-width="6"/>
+                <rect x="111" y="62" width="6" height="20" fill="#d6b300"/>
+                <rect x="20" y="94" width="322" height="13" fill="#111"/>
+                <circle cx="82" cy="111" r="27" fill="#1f2933"/>
+                <circle cx="82" cy="111" r="13" fill="#cfd5dc"/>
+                <circle cx="262" cy="111" r="27" fill="#1f2933"/>
+                <circle cx="262" cy="111" r="13" fill="#cfd5dc"/>
+              </g>
+              <g transform="translate(598 216)">
+                <rect x="0" y="74" width="66" height="54" fill="#c8924d"/>
+                <rect x="66" y="74" width="62" height="54" fill="#d6a15b"/>
+                <rect x="27" y="20" width="62" height="54" fill="#d8a45f"/>
+                <rect x="89" y="34" width="55" height="40" fill="#c8924d"/>
+                <path d="M35 20v54M97 34v40M66 74v54" stroke="#a87332" stroke-width="2"/>
+                <circle cx="52" cy="43" r="9" fill="none" stroke="#d6b300" stroke-width="3"/>
+                <path d="M47 51v12" stroke="#d6b300" stroke-width="3"/>
+                <text x="18" y="110" font-size="11" font-family="Arial" font-weight="800" fill="#68420f">POST UA</text>
+              </g>
+            </svg>
+          </div>
+        </div>
+      </section>
+
+      <section class="booking container" id="private" aria-label="Розрахунок доставки">
+        <div class="booking-card">
+          <div class="tabs" role="tablist" aria-label="Тип відправлення">
+            <button class="tab" id="booking-tab-private" type="button" role="tab" aria-selected="true" aria-controls="booking-panel-private" data-stage-tab="private">
+              <span class="tab-step">01</span>
+              <span>Приватні посилки</span>
+            </button>
+            <button class="tab" id="booking-tab-documents" type="button" role="tab" aria-selected="false" aria-controls="booking-panel-documents" data-stage-tab="documents">
+              <span class="tab-step">02</span>
+              <span>Документи</span>
+            </button>
+            <button class="tab" id="booking-tab-eu" type="button" role="tab" aria-selected="false" aria-controls="booking-panel-eu" data-stage-tab="eu">
+              <span class="tab-step">03</span>
+              <span>Ірландія → ЄС</span>
+            </button>
+            <button class="tab" id="booking-tab-commercial" type="button" role="tab" aria-selected="false" aria-controls="booking-panel-commercial" data-stage-tab="commercial">
+              <span class="tab-step">04</span>
+              <span>Комерційні</span>
+            </button>
+          </div>
+          <div class="booking-body booking-panel is-active" id="booking-panel-private" role="tabpanel" aria-labelledby="booking-tab-private" data-stage-panel="private">
+            <form class="route-form" data-route="ie-ua">
+              <h2 class="route-heading">
+                <span class="flag flag-ie" aria-hidden="true"><span></span><span></span><span></span></span>
+                Ірландія → Україна
+              </h2>
+              <label class="field">
+                <span>Введіть Eircode</span>
+                <input type="text" placeholder="Наприклад, D01 A1B2" autocomplete="postal-code">
+              </label>
+              <button class="btn" type="button">Перевірити Eircode</button>
+            </form>
+            <button class="swap" type="button" aria-label="Поміняти напрямки місцями">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M7 7h10" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>
+                <path d="m14 4 3 3-3 3" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M17 17H7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>
+                <path d="m10 14-3 3 3 3" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+            <form class="route-form" data-route="ua-ie">
+              <h2 class="route-heading">
+                <span class="flag flag-ua" aria-hidden="true"><span></span><span></span></span>
+                Україна → Ірландія
+              </h2>
+              <label class="field">
+                <span>Вага посилки (кг)</span>
+                <input type="text" inputmode="decimal" placeholder="Наприклад, 5" autocomplete="off">
+              </label>
+              <button class="btn" type="button">Розрахувати вартість</button>
+            </form>
+          </div>
+          <div class="booking-body booking-panel" id="booking-panel-documents" role="tabpanel" aria-labelledby="booking-tab-documents" data-stage-panel="documents" hidden>
+            <form class="route-form" data-route="documents-ie-ua">
+              <h2 class="route-heading">
+                <span class="flag flag-ie" aria-hidden="true"><span></span><span></span><span></span></span>
+                Ірландія → Україна
+              </h2>
+              <label class="field">
+                <span>Введіть Eircode / ER-код</span>
+                <input type="text" placeholder="Наприклад, D01 A1B2" autocomplete="postal-code">
+              </label>
+              <button class="btn" type="button">Перевірити код</button>
+            </form>
+            <form class="route-form" data-route="documents-ua-ie">
+              <h2 class="route-heading">
+                <span class="flag flag-ua" aria-hidden="true"><span></span><span></span></span>
+                Україна → Ірландія
+              </h2>
+              <label class="field">
+                <span>Код або індекс відправлення</span>
+                <input type="text" placeholder="Формат буде уточнено" autocomplete="off">
+              </label>
+              <button class="btn" type="button">Продовжити</button>
+            </form>
+          </div>
+          <div class="booking-body booking-panel booking-body-single" id="booking-panel-eu" role="tabpanel" aria-labelledby="booking-tab-eu" data-stage-panel="eu" hidden>
+            <form class="route-form" data-route="ie-eu">
+              <h2 class="route-heading">
+                <span class="flag flag-ie" aria-hidden="true"><span></span><span></span><span></span></span>
+                Ірландія → ЄС
+              </h2>
+              <label class="field">
+                <span>Введіть Eircode</span>
+                <input type="text" placeholder="Наприклад, D01 A1B2" autocomplete="postal-code">
+              </label>
+              <label class="field">
+                <span>Країна отримання</span>
+                <input type="text" placeholder="Наприклад, Німеччина" autocomplete="country-name">
+              </label>
+              <button class="btn" type="button">Залишити запит</button>
+            </form>
+            <div class="stage-note">
+              <strong>Етап 03</strong>
+              <h3>Доставка з Ірландії до країн ЄС</h3>
+              <p>На цьому етапі достатньо ввести Eircode та країну отримання. Деталі маршруту й вартість можна уточнити після запиту.</p>
+            </div>
+          </div>
+          <div class="booking-body booking-panel booking-body-single" id="booking-panel-commercial" role="tabpanel" aria-labelledby="booking-tab-commercial" data-stage-panel="commercial" hidden>
+            <form class="route-form" data-route="commercial">
+              <h2 class="route-heading">
+                Комерційні відправлення
+              </h2>
+              <label class="field">
+                <span>Назва компанії</span>
+                <input type="text" placeholder="Вкажіть компанію" autocomplete="organization">
+              </label>
+              <label class="field">
+                <span>Телефон або Email</span>
+                <input type="text" placeholder="Контакт для зв'язку" autocomplete="email">
+              </label>
+              <button class="btn" type="button">Обговорити умови</button>
+            </form>
+            <div class="stage-note">
+              <strong>Етап 04</strong>
+              <h3>Умови для B2B-відправлень</h3>
+              <p>Для комерційних вантажів краще погодити обсяг, регулярність, документи та формат забору окремо.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="result-panel" aria-live="polite">
+          <div class="result-status">
+            <span class="check-circle">
+              <svg width="42" height="42" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="m5 12 4 4L19 6" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+            <div>
+              <h2>Eircode перевірено</h2>
+              <p>Ми обслуговуємо вашу зону</p>
+            </div>
+          </div>
+          <div class="next-steps">
+            <h3>Що далі?</h3>
+            <ol>
+              <li><span class="step-number">1</span><span>Переконайтесь, що всі дані введені правильно.</span></li>
+              <li><span class="step-number">2</span><span>Підготуйте посилку до відправлення.</span></li>
+              <li><span class="step-number">3</span><span>Ми заберемо та доставимо у найкоротші терміни.</span></li>
+            </ol>
+          </div>
+          <div class="result-actions">
+            <a class="btn btn-outline" href="#question">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7A8.5 8.5 0 1 1 21 11.5Z" stroke="currentColor" stroke-width="2"/>
+              </svg>
+              Задати питання
+            </a>
+            <a class="btn" href="#question">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="m22 2-7 20-4-9-9-4Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M22 2 11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+              Відправити запит
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <section class="section why-section">
+        <div class="container why">
+          <div class="why-copy">
+            <div class="section-head">
+              <h2 class="section-title">Чому обирають PostUA</h2>
+            </div>
+            <p>Доставляємо посилки між Ірландією та Україною з прозорими умовами, підтримкою на кожному етапі та зрозумілим маршрутом.</p>
+            <span class="trust-badge">Ірландія → Україна</span>
+            <div class="trust-route" aria-hidden="true">
+              <span class="route-point">IE</span>
+              <span class="route-line"></span>
+              <span class="route-point">UA</span>
+            </div>
+          </div>
+          <div class="stats">
+            <article class="stat-card">
+              <span class="stat-value">5+</span>
+              <strong>років досвіду</strong>
+              <span>Працюємо з реальними маршрутами між Ірландією, Україною та Європою.</span>
+            </article>
+            <article class="stat-card">
+              <span class="stat-value">1000+</span>
+              <strong>доставок виконано</strong>
+              <span>Посилки, документи та особисті речі проходять зрозумілий процес доставки.</span>
+            </article>
+            <article class="stat-card">
+              <span class="stat-value">2</span>
+              <strong>формати відправки</strong>
+              <span>Можна принести посилку в точку збору або погодити адресний забір.</span>
+            </article>
+            <article class="stat-card">
+              <span class="stat-value">09-18</span>
+              <strong>підтримка у робочий час</strong>
+              <span>Відповідаємо у месенджерах і тримаємо вас у курсі статусу відправлення.</span>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="container">
+          <div class="section-head">
+            <h2 class="section-title">Відгуки клієнтів</h2>
+          </div>
+          <div class="reviews-wrap">
+            <button class="slider-btn prev" type="button" aria-label="Попередній відгук">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="m15 18-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+            <div class="reviews-viewport" aria-live="polite">
+              <div class="reviews">
+                <article class="review-card">
+                  <div class="review-top">
+                    <span class="avatar"><img src="review-oksana.jpg" alt="Фото Оксани М."></span>
+                    <div>
+                      <strong>Оксана М.</strong>
+                      <span>Дублін, Ірландія</span>
+                      <div class="stars" aria-label="5 зірок">★★★★★</div>
+                    </div>
+                  </div>
+                  <p>Дуже задоволена сервісом! Посилка дійшла швидко і без пошкоджень. Підтримка на зв'язку на всіх етапах. Рекомендую!</p>
+                </article>
+                <article class="review-card">
+                  <div class="review-top">
+                    <span class="avatar"><img src="review-andriy.jpg" alt="Фото Андрія К."></span>
+                    <div>
+                      <strong>Андрій К.</strong>
+                      <span>Київ, Україна</span>
+                      <div class="stars" aria-label="5 зірок">★★★★★</div>
+                    </div>
+                  </div>
+                  <p>Відправляв документи в Ірландію. Все чітко, швидко та за адекватною ціною. Обов'язково скористаюсь ще.</p>
+                </article>
+                <article class="review-card">
+                  <div class="review-top">
+                    <span class="avatar"><img src="review-natalia.jpg" alt="Фото Наталії П."></span>
+                    <div>
+                      <strong>Наталія П.</strong>
+                      <span>Лімерик, Ірландія</span>
+                      <div class="stars" aria-label="5 зірок">★★★★★</div>
+                    </div>
+                  </div>
+                  <p>Чудовий сервіс і приємне спілкування. Забрали посилку прямо з дому та доставили вчасно. Дякую!</p>
+                </article>
+              </div>
+            </div>
+            <button class="slider-btn next" type="button" aria-label="Наступний відгук">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="m9 18 6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+          </div>
+          <div class="dots" aria-label="Навігація відгуків"></div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="container">
+          <div class="section-head">
+            <h2 class="section-title">Як це працює</h2>
+          </div>
+          <div class="work-grid">
+            <article class="work-step">
+              <div class="work-visual" aria-hidden="true">
+                <span class="work-step-number">01</span>
+                <span class="work-route-dots"><span class="is-active"></span><span></span><span></span></span>
+              </div>
+              <div>
+                <strong>Замовлення</strong>
+                <ul class="work-list">
+                  <li>Заповнюйте форму на сайті</li>
+                  <li>Зателефонуйте за номером <a href="tel:+353874108260">+353874108260</a></li>
+                  <li>Напишіть в Telegram <a href="https://t.me/Post2Ua">t.me/Post2Ua</a></li>
+                </ul>
+              </div>
+            </article>
+            <article class="work-step">
+              <div class="work-visual" aria-hidden="true">
+                <span class="work-step-number">02</span>
+                <span class="work-route-dots"><span></span><span class="is-active"></span><span></span></span>
+              </div>
+              <div>
+                <strong>Відправка</strong>
+                <ul class="work-list">
+                  <li>Спакуйте вашу посилку в коробку</li>
+                  <li>Принесіть в точку збору</li>
+                  <li>Очікуйте кур'єра (за умови адресного забору)</li>
+                </ul>
+              </div>
+            </article>
+            <article class="work-step">
+              <div class="work-visual" aria-hidden="true">
+                <span class="work-step-number">03</span>
+                <span class="work-route-dots"><span></span><span></span><span class="is-active"></span></span>
+              </div>
+              <div>
+                <strong>Отримання</strong>
+                <ul class="work-list">
+                  <li>Отримайте на обраному відділенні Нової Пошти або оператора в країні отримання</li>
+                  <li>Очікуйте кур'єра Нової Пошти або кур'єра оператора в країні отримання (за умови адресної доставки)</li>
+                </ul>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="faq">
+        <div class="container faq-block">
+          <div>
+            <div class="section-head">
+              <h2 class="section-title">Часті питання</h2>
+            </div>
+            <p class="faq-intro">Зібрали відповіді на запитання, які найчастіше виникають перед відправкою. Якщо потрібна точна консультація щодо вашої посилки, напишіть нам.</p>
+          </div>
+          <div class="faq-list">
+            <details class="faq-item">
+              <summary>Що можна відправляти (посилка/документи/інше) і які є обмеження?</summary>
+              <p>Можна відправляти особисті речі, посилки, документи та інші дозволені відправлення. Обмеження залежать від країни, ваги, габаритів і вмісту; небезпечні та заборонені товари не приймаються.</p>
+            </details>
+            <details class="faq-item">
+              <summary>Які способи оплати доступні?</summary>
+              <p>Доступні варіанти оплати уточнюються під час оформлення замовлення та залежать від напрямку, типу доставки і формату відправлення.</p>
+            </details>
+            <details class="faq-item">
+              <summary>Як правильно упаковувати відправлення?</summary>
+              <p>Використовуйте міцну коробку, заповнюйте порожнини захисним матеріалом, щільно заклеюйте шви скотчем і перевіряйте, щоб вміст не рухався всередині.</p>
+            </details>
+            <details class="faq-item">
+              <summary>Скільки посилок я можу надіслати в одному замовленні?</summary>
+              <p>В одному замовленні можна оформити кілька посилок. Вкажіть кількість, вагу, габарити та дані отримувача для кожного відправлення.</p>
+            </details>
+            <details class="faq-item">
+              <summary>Як підготувати посилку до відправки?</summary>
+              <p>Перевірте вміст, упакуйте коробку, підготуйте контактні дані відправника й отримувача та переконайтеся, що посилка відповідає правилам перевезення.</p>
+            </details>
+            <details class="faq-item">
+              <summary>Чи можна відправляти крихкі речі? Як їх правильно пакувати?</summary>
+              <p>Так, але крихкі речі потрібно пакувати в кілька шарів захисту, фіксувати всередині коробки та повідомити нас про крихкий вміст під час оформлення.</p>
+            </details>
+            <details class="faq-item">
+              <summary>Чи можу я надіслати кілька посилок одночасно і оплатити доставку разом?</summary>
+              <p>Так, кілька посилок можна оформити одночасно та погодити спільну оплату доставки для всього замовлення.</p>
+            </details>
+            <details class="faq-item">
+              <summary>Чи можливо отримати рахунок за відправлення?</summary>
+              <p>Так, за потреби можна запросити рахунок або підтвердження оплати. Повідомте про це під час оформлення замовлення.</p>
+            </details>
+            <details class="faq-item">
+              <summary>Що станеться з посилкою, якщо отримувач відмовиться її прийняти?</summary>
+              <p>Ми зв'яжемося з відправником і погодимо подальші дії: повторну доставку, повернення або інше рішення залежно від ситуації.</p>
+            </details>
+            <details class="faq-item">
+              <summary>Що робити, якщо моя посилка втрачена або пошкоджена?</summary>
+              <p>Зв'яжіться з нами та надайте номер відправлення, фото пакування або пошкодження й опис ситуації. Ми перевіримо маршрут і допоможемо з подальшими кроками.</p>
+            </details>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="question">
+        <div class="container contact-panel">
+          <div class="question-form">
+            <h2>Задати питання</h2>
+            <form class="form-grid">
+              <label class="field">
+                <input type="text" placeholder="Ім'я*" required>
+              </label>
+              <label class="field">
+                <input type="text" placeholder="Телефон або Email*" required>
+              </label>
+              <label class="field wide">
+                <textarea placeholder="Повідомлення*"></textarea>
+              </label>
+              <button class="btn wide" type="button">Відправити</button>
+              <span class="privacy">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <rect x="5" y="11" width="14" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+                  <path d="M8 11V7a4 4 0 0 1 8 0v4" stroke="currentColor" stroke-width="2"/>
+                </svg>
+                Ми не передаємо ваші дані третім особам.
+              </span>
+            </form>
+          </div>
+          <div class="contact-info">
+            <h2>Наші контакти</h2>
+            <div class="contact-list">
+              <a class="contact-row" href="tel:+353894369474">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M22 16.9v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.18 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.72c.13.96.35 1.9.67 2.8a2 2 0 0 1-.45 2.11L8.1 9.86a16 16 0 0 0 6 6l1.23-1.23a2 2 0 0 1 2.11-.45c.9.32 1.84.54 2.8.67A2 2 0 0 1 22 16.9Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                +353 89 436 94 74
+              </a>
+              <a class="contact-row" href="mailto:info@postua.ie">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="2"/>
+                  <path d="m3 7 9 6 9-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                info@postua.ie
+              </a>
+              <strong>Ми у месенджерах</strong>
+              <div class="messengers">
+                <a class="messenger" href="#">
+                  <span class="messenger-dot whatsapp" aria-hidden="true">
+                    <svg viewBox="0 0 24 24">
+                      <path d="M20.52 3.45A11.83 11.83 0 0 0 12.08 0C5.5 0 .16 5.33.16 11.9c0 2.09.55 4.13 1.59 5.93L.06 24l6.31-1.65a11.87 11.87 0 0 0 5.7 1.45h.01c6.57 0 11.91-5.34 11.91-11.9 0-3.18-1.24-6.17-3.47-8.45ZM12.08 21.8h-.01a9.88 9.88 0 0 1-5.04-1.38l-.36-.21-3.75.98 1-3.65-.24-.38a9.86 9.86 0 0 1-1.51-5.26c0-5.46 4.45-9.9 9.91-9.9 2.65 0 5.13 1.03 7 2.9a9.84 9.84 0 0 1 2.9 7c0 5.46-4.45 9.9-9.9 9.9Zm5.43-7.4c-.3-.15-1.76-.87-2.04-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.16-.17.2-.35.22-.65.08-.3-.15-1.26-.46-2.4-1.48-.89-.79-1.49-1.76-1.66-2.06-.17-.3-.02-.46.13-.61.14-.13.3-.35.45-.52.15-.18.2-.3.3-.5.1-.2.05-.37-.03-.52-.07-.15-.67-1.61-.92-2.21-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.08-.79.37-.27.3-1.04 1.02-1.04 2.48 0 1.47 1.07 2.88 1.22 3.08.15.2 2.1 3.2 5.09 4.49.71.31 1.26.49 1.7.62.71.23 1.36.2 1.87.12.57-.09 1.76-.72 2.01-1.41.25-.7.25-1.29.17-1.42-.07-.12-.27-.2-.57-.35Z"/>
+                    </svg>
+                  </span>
+                  WhatsApp
+                </a>
+                <a class="messenger" href="#">
+                  <span class="messenger-dot telegram" aria-hidden="true">
+                    <svg viewBox="0 0 24 24">
+                      <path d="M21.72 4.7 18.6 19.42c-.24 1.05-.85 1.31-1.72.82l-4.75-3.5-2.29 2.2c-.25.25-.47.47-.96.47l.34-4.84L18.04 6.6c.38-.34-.08-.53-.6-.2L6.55 13.26l-4.69-1.47c-1.02-.32-1.04-1.02.21-1.5L20.4 3.22c.85-.32 1.6.2 1.32 1.48Z"/>
+                    </svg>
+                  </span>
+                  Telegram
+                </a>
+              </div>
+              <strong>Пн – Пт: 09:00 – 18:00 (GMT)</strong>
+            </div>
+            <img class="contact-art" src="contacts-map.png" alt="Маршрут доставки між Ірландією та Україною">
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-main">
+        <div class="footer-col footer-brand">
+          <a class="logo" href="#" aria-label="Post UA Service">
+            <img class="logo-img" src="post-ua-service-logo.jpg" alt="POST UA Service">
+          </a>
+          <p class="footer-copy">Доставка посилок між Україною, Ірландією та Європою. Просто, швидко, надійно.</p>
+          <p class="footer-note">© <span data-current-year>2026</span> PostUA Service. Усі права захищено.</p>
+        </div>
+        <div class="footer-col">
+          <h3>Швидкі посилання</h3>
+          <ul>
+            <li><a href="#private">Ірландія → Україна</a></li>
+            <li><a href="#private">Україна → Ірландія</a></li>
+            <li><a href="#private">Ірландія → ЄС</a></li>
+            <li><a href="#private">Комерційні (B2B)</a></li>
+            <li><a href="#private">Документи</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h3>Інформація</h3>
+          <ul>
+            <li><a href="#">Про нас</a></li>
+            <li><a href="#">Як це працює</a></li>
+            <li><a href="#faq">Часті запитання</a></li>
+            <li><a href="#">Політика конфіденційності</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h3>Контакти</h3>
+          <ul>
+            <li class="footer-contact-row">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M22 16.9v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.18 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.72c.13.96.35 1.9.67 2.8a2 2 0 0 1-.45 2.11L8.1 9.86a16 16 0 0 0 6 6l1.23-1.23a2 2 0 0 1 2.11-.45c.9.32 1.84.54 2.8.67A2 2 0 0 1 22 16.9Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              +353 89 436 94 74
+            </li>
+            <li class="footer-contact-row">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="2"/>
+                <path d="m3 7 9 6 9-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              info@postua.ie
+            </li>
+            <li class="footer-messengers">
+              <a class="footer-messenger" href="#">
+                <span class="footer-messenger-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24">
+                    <path class="icon-fill" d="M20.52 3.45A11.83 11.83 0 0 0 12.08 0C5.5 0 .16 5.33.16 11.9c0 2.09.55 4.13 1.59 5.93L.06 24l6.31-1.65a11.87 11.87 0 0 0 5.7 1.45h.01c6.57 0 11.91-5.34 11.91-11.9 0-3.18-1.24-6.17-3.47-8.45ZM12.08 21.8h-.01a9.88 9.88 0 0 1-5.04-1.38l-.36-.21-3.75.98 1-3.65-.24-.38a9.86 9.86 0 0 1-1.51-5.26c0-5.46 4.45-9.9 9.91-9.9 2.65 0 5.13 1.03 7 2.9a9.84 9.84 0 0 1 2.9 7c0 5.46-4.45 9.9-9.9 9.9Zm5.43-7.4c-.3-.15-1.76-.87-2.04-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.16-.17.2-.35.22-.65.08-.3-.15-1.26-.46-2.4-1.48-.89-.79-1.49-1.76-1.66-2.06-.17-.3-.02-.46.13-.61.14-.13.3-.35.45-.52.15-.18.2-.3.3-.5.1-.2.05-.37-.03-.52-.07-.15-.67-1.61-.92-2.21-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.08-.79.37-.27.3-1.04 1.02-1.04 2.48 0 1.47 1.07 2.88 1.22 3.08.15.2 2.1 3.2 5.09 4.49.71.31 1.26.49 1.7.62.71.23 1.36.2 1.87.12.57-.09 1.76-.72 2.01-1.41.25-.7.25-1.29.17-1.42-.07-.12-.27-.2-.57-.35Z"/>
+                  </svg>
+                </span>
+                WhatsApp
+              </a>
+              <a class="footer-messenger" href="#">
+                <span class="footer-messenger-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24">
+                    <path class="icon-fill" d="M21.72 4.7 18.6 19.42c-.24 1.05-.85 1.31-1.72.82l-4.75-3.5-2.29 2.2c-.25.25-.47.47-.96.47l.34-4.84L18.04 6.6c.38-.34-.08-.53-.6-.2L6.55 13.26l-4.69-1.47c-1.02-.32-1.04-1.02.21-1.5L20.4 3.22c.85-.32 1.6.2 1.32 1.48Z"/>
+                  </svg>
+                </span>
+                Telegram
+              </a>
+            </li>
+            <li><strong>Пн – Пт:</strong> 09:00 – 18:00 (GMT)</li>
+          </ul>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    document.querySelectorAll("[data-current-year]").forEach((node) => {
+      node.textContent = new Date().getFullYear();
+    });
+
+    const trustBadge = document.querySelector(".trust-badge");
+
+    if (trustBadge && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      const routeDirections = ["Ірландія → Україна", "Україна → Ірландія"];
+      const routeCycleMs = 14000;
+      let routeDirectionIndex = 0;
+
+      trustBadge.textContent = routeDirections[routeDirectionIndex];
+
+      window.setInterval(() => {
+        routeDirectionIndex = (routeDirectionIndex + 1) % routeDirections.length;
+        trustBadge.classList.add("is-changing");
+
+        window.setTimeout(() => {
+          trustBadge.textContent = routeDirections[routeDirectionIndex];
+          trustBadge.classList.remove("is-changing");
+        }, 160);
+      }, routeCycleMs);
+    }
+
+    const menuToggle = document.querySelector(".menu-toggle");
+    const primaryNav = document.querySelector("#primary-nav");
+
+    if (menuToggle && primaryNav) {
+      const closeMenu = () => {
+        primaryNav.classList.remove("is-open");
+        menuToggle.setAttribute("aria-expanded", "false");
+        menuToggle.setAttribute("aria-label", "Відкрити меню");
+      };
+
+      menuToggle.addEventListener("click", () => {
+        const isOpen = primaryNav.classList.toggle("is-open");
+        menuToggle.setAttribute("aria-expanded", String(isOpen));
+        menuToggle.setAttribute("aria-label", isOpen ? "Закрити меню" : "Відкрити меню");
+      });
+
+      primaryNav.querySelectorAll("a").forEach((link) => {
+        link.addEventListener("click", closeMenu);
+      });
+
+      document.addEventListener("click", (event) => {
+        if (!(event.target instanceof Element) || !event.target.closest(".site-header")) {
+          closeMenu();
+        }
+      });
+
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") {
+          closeMenu();
+        }
+      });
+
+      window.addEventListener("resize", () => {
+        if (window.innerWidth > 820) {
+          closeMenu();
+        }
+      });
+    }
+
+    const tabs = document.querySelectorAll("[data-stage-tab]");
+    const bookingPanels = document.querySelectorAll("[data-stage-panel]");
+    tabs.forEach((tab) => {
+      tab.addEventListener("click", () => {
+        const targetStage = tab.dataset.stageTab;
+        tabs.forEach((item) => item.setAttribute("aria-selected", "false"));
+        tab.setAttribute("aria-selected", "true");
+        bookingPanels.forEach((panel) => {
+          const isActive = panel.dataset.stagePanel === targetStage;
+          panel.classList.toggle("is-active", isActive);
+          panel.hidden = !isActive;
+        });
+      });
+    });
+
+    const reviewsTrack = document.querySelector(".reviews");
+    const reviewsViewport = document.querySelector(".reviews-viewport");
+    const reviewsDots = document.querySelector(".dots");
+    const reviewPrev = document.querySelector(".slider-btn.prev");
+    const reviewNext = document.querySelector(".slider-btn.next");
+
+    if (reviewsTrack && reviewsViewport && reviewsDots && reviewPrev && reviewNext) {
+      const reviewCards = Array.from(reviewsTrack.querySelectorAll(".review-card"));
+      let reviewIndex = 0;
+      let pointerStartX = 0;
+      let reviewTimer = 0;
+      const reviewInterval = 30000;
+
+      reviewCards.forEach((card) => {
+        const clone = card.cloneNode(true);
+        clone.classList.add("is-clone");
+        clone.setAttribute("aria-hidden", "true");
+        reviewsTrack.appendChild(clone);
+      });
+
+      const reviewDotButtons = reviewCards.map((_, index) => {
+        const dot = document.createElement("button");
+        dot.className = "dot";
+        dot.type = "button";
+        dot.setAttribute("aria-label", `Показати відгук ${index + 1}`);
+        reviewsDots.appendChild(dot);
+        return dot;
+      });
+
+      const getReviewStep = () => {
+        const firstCard = reviewsTrack.querySelector(".review-card");
+        const styles = window.getComputedStyle(reviewsTrack);
+        const gap = parseFloat(styles.columnGap || styles.gap) || 0;
+        return firstCard ? firstCard.getBoundingClientRect().width + gap : 0;
+      };
+
+      const updateReviews = () => {
+        reviewsTrack.style.transform = `translateX(-${getReviewStep() * reviewIndex}px)`;
+        reviewCards.forEach((card, index) => {
+          card.classList.toggle("is-active", index === reviewIndex);
+        });
+        reviewDotButtons.forEach((dot, index) => {
+          const isActive = index === reviewIndex;
+          dot.classList.toggle("active", isActive);
+          if (isActive) {
+            dot.setAttribute("aria-current", "true");
+          } else {
+            dot.removeAttribute("aria-current");
+          }
+        });
+      };
+
+      const setReview = (index) => {
+        reviewIndex = (index + reviewCards.length) % reviewCards.length;
+        updateReviews();
+      };
+
+      const startReviewAutoplay = () => {
+        window.clearInterval(reviewTimer);
+        reviewTimer = window.setInterval(() => {
+          setReview(reviewIndex + 1);
+        }, reviewInterval);
+      };
+
+      const moveReview = (index) => {
+        setReview(index);
+        startReviewAutoplay();
+      };
+
+      reviewDotButtons.forEach((dot, index) => {
+        dot.addEventListener("click", () => moveReview(index));
+      });
+
+      reviewPrev.addEventListener("click", () => moveReview(reviewIndex - 1));
+      reviewNext.addEventListener("click", () => moveReview(reviewIndex + 1));
+
+      reviewsViewport.addEventListener("pointerdown", (event) => {
+        pointerStartX = event.clientX;
+      });
+
+      reviewsViewport.addEventListener("pointerup", (event) => {
+        const delta = event.clientX - pointerStartX;
+        if (Math.abs(delta) > 42) {
+          moveReview(reviewIndex + (delta < 0 ? 1 : -1));
+        }
+      });
+
+      window.addEventListener("resize", updateReviews);
+      updateReviews();
+      startReviewAutoplay();
+    }
+
+    document.querySelector(".swap").addEventListener("click", () => {
+      document.querySelector("[data-stage-panel='private']").classList.toggle("reverse");
+    });
+
+    document.querySelectorAll(".route-form .btn").forEach((button) => {
+      button.addEventListener("click", () => {
+        const panel = document.querySelector(".result-panel");
+        const form = button.closest(".route-form");
+        const stage = button.closest("[data-stage-panel]")?.dataset.stagePanel;
+        const title = panel.querySelector(".result-status h2");
+        const text = panel.querySelector(".result-status p");
+
+        const resultCopy = {
+          private: ["Дані прийнято", "Ми перевіримо напрямок, вагу та доступний формат доставки."],
+          documents: ["Код прийнято до перевірки", "Наступна дія залежатиме від напрямку та введеного коду."],
+          eu: ["Запит для ЄС прийнято", "Ми уточнимо маршрут і вартість доставки до країни отримання."],
+          commercial: ["Запит для B2B прийнято", "Ми погодимо умови, документи та формат регулярної доставки."]
+        };
+
+        if (title && text && resultCopy[stage]) {
+          title.textContent = resultCopy[stage][0];
+          text.textContent = resultCopy[stage][1];
+        }
+
+        if (title && text && form?.dataset.route === "ie-ua") {
+          title.textContent = "Eircode перевірено";
+          text.textContent = "Ми обслуговуємо вашу зону";
+        }
+
+        panel.scrollIntoView({ behavior: "smooth", block: "center" });
+        panel.animate(
+          [
+            { boxShadow: "0 0 0 0 rgba(76, 175, 80, 0)" },
+            { boxShadow: "0 0 0 8px rgba(76, 175, 80, 0.16)" },
+            { boxShadow: "0 0 0 0 rgba(76, 175, 80, 0)" }
+          ],
+          { duration: 900, easing: "ease-out" }
+        );
+      });
+    });
+
+    document.querySelector(".question-form .btn").addEventListener("click", (event) => {
+      event.currentTarget.textContent = "Запит відправлено";
+    });
+  </script>
+</body>
+</html>
