@@ -1,3 +1,69 @@
+    const euQuoteForm = document.querySelector("[data-eu-quote-form]");
+
+    if (euQuoteForm) {
+      const panels = Array.from(euQuoteForm.querySelectorAll("[data-eu-panel]"));
+      const steps = Array.from(euQuoteForm.querySelectorAll("[data-eu-step]"));
+      const submitButton = euQuoteForm.querySelector("[data-eu-submit]");
+      const submitNote = euQuoteForm.querySelector("[data-eu-submit-note]");
+      let currentStep = 1;
+
+      const showEuStep = (step) => {
+        currentStep = step;
+        panels.forEach((panel) => {
+          const isActive = Number(panel.dataset.euPanel) === currentStep;
+          panel.hidden = !isActive;
+          panel.classList.toggle("is-active", isActive);
+        });
+        steps.forEach((item) => {
+          const itemStep = Number(item.dataset.euStep);
+          item.classList.toggle("is-active", itemStep === currentStep);
+          item.classList.toggle("is-complete", itemStep < currentStep);
+        });
+      };
+
+      euQuoteForm.querySelectorAll("[data-eu-next]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const panel = button.closest("[data-eu-panel]");
+          const invalidField = Array.from(panel?.querySelectorAll("input[required], select[required]") || [])
+            .find((field) => !field.checkValidity());
+
+          if (invalidField) {
+            invalidField.reportValidity();
+            return;
+          }
+
+          showEuStep(Number(button.dataset.euNext));
+        });
+      });
+
+      euQuoteForm.querySelectorAll("[data-eu-prev]").forEach((button) => {
+        button.addEventListener("click", () => showEuStep(Number(button.dataset.euPrev)));
+      });
+
+      euQuoteForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const activePanel = panels.find((panel) => Number(panel.dataset.euPanel) === currentStep);
+        const invalidField = Array.from(activePanel?.querySelectorAll("input[required], select[required]") || [])
+          .find((field) => !field.checkValidity());
+
+        if (invalidField) {
+          invalidField.reportValidity();
+          return;
+        }
+
+        if (submitButton) {
+          submitButton.textContent = "Запит надіслано";
+          submitButton.disabled = true;
+        }
+
+        if (submitNote) {
+          submitNote.hidden = false;
+        }
+      });
+
+      showEuStep(1);
+    }
+
 document.querySelectorAll("[data-current-year]").forEach((node) => {
       node.textContent = new Date().getFullYear();
     });
@@ -242,6 +308,70 @@ document.querySelectorAll("[data-current-year]").forEach((node) => {
       });
     }
 
+    const routeWeightForm = document.querySelector("[data-route-weight-form]");
+
+    if (routeWeightForm) {
+      const weightInput = routeWeightForm.querySelector("[data-route-weight-input]");
+      const calculator = document.querySelector("#calculator");
+      const calculatorWeight = calculator?.querySelector('[data-simple-calc-field="weight"]');
+
+      routeWeightForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+
+        if (!weightInput?.checkValidity()) {
+          weightInput?.reportValidity();
+          return;
+        }
+
+        if (calculatorWeight) {
+          calculatorWeight.value = weightInput.value;
+          calculatorWeight.dispatchEvent(new Event("input", { bubbles: true }));
+        }
+
+        calculator?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    }
+
+    const documentsRouteForm = document.querySelector("[data-documents-route-form]");
+
+    if (documentsRouteForm) {
+      const routeOutput = document.querySelector("[data-documents-route-output]");
+      const questionSection = document.querySelector("#question");
+      const routeInputs = Array.from(documentsRouteForm.querySelectorAll('input[name="documents-route"]'));
+      const requestedRoute = new URLSearchParams(window.location.search).get("route");
+      const requestedRouteLabel = {
+        "ie-ua": "Ірландія → Україна",
+        "ua-ie": "Україна → Ірландія"
+      }[requestedRoute];
+
+      if (requestedRouteLabel) {
+        routeInputs.forEach((input) => {
+          input.checked = input.value === requestedRouteLabel;
+        });
+      }
+
+      const syncDocumentsRoute = () => {
+        const selectedRoute = routeInputs.find((input) => input.checked)?.value || "Ірландія → Україна";
+        documentsRouteForm.dataset.selectedRoute = selectedRoute;
+        if (routeOutput) {
+          routeOutput.setAttribute("value", selectedRoute);
+          routeOutput.value = selectedRoute;
+        }
+      };
+
+      routeInputs.forEach((input) => {
+        input.addEventListener("change", syncDocumentsRoute);
+      });
+
+      documentsRouteForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+        syncDocumentsRoute();
+        questionSection?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+
+      syncDocumentsRoute();
+    }
+
     const routeWizard = document.querySelector("[data-route-wizard]");
 
     if (routeWizard) {
@@ -250,10 +380,6 @@ document.querySelectorAll("[data-current-year]").forEach((node) => {
       const eircodeField = routeWizard.querySelector("[data-eircode-field]");
       const eircodeSummary = routeWizard.querySelector("[data-eircode-summary]");
       let currentWizardStep = 1;
-
-      routeWizard.addEventListener("submit", (event) => {
-        event.preventDefault();
-      });
 
       const setWizardStep = (step) => {
         currentWizardStep = step;
@@ -273,6 +399,15 @@ document.querySelectorAll("[data-current-year]").forEach((node) => {
 
       routeWizard.querySelectorAll("[data-wizard-next]").forEach((button) => {
         button.addEventListener("click", () => {
+          const currentPanel = button.closest("[data-wizard-panel]");
+          const invalidField = Array.from(currentPanel?.querySelectorAll("input[required]") || [])
+            .find((input) => !input.checkValidity());
+
+          if (invalidField) {
+            invalidField.reportValidity();
+            return;
+          }
+
           if (currentWizardStep === 1 && eircodeSummary) {
             const eircode = eircodeField?.value.trim().toUpperCase();
             eircodeSummary.textContent = eircode ? `${eircode}: заявку можна продовжити` : "Eircode буде перевірено";
@@ -291,15 +426,27 @@ document.querySelectorAll("[data-current-year]").forEach((node) => {
       const routeSubmit = routeWizard.querySelector("[data-route-submit]");
       const routeSubmitNote = routeWizard.querySelector("[data-route-submit-note]");
 
-      if (routeSubmit) {
-        routeSubmit.addEventListener("click", () => {
+      routeWizard.addEventListener("submit", (event) => {
+        event.preventDefault();
+
+        if (!routeWizard.checkValidity()) {
+          routeWizard.reportValidity();
+          return;
+        }
+
+        if (routeSubmit) {
           routeSubmit.textContent = "Заявку відправлено";
+          routeSubmit.disabled = true;
 
           if (routeSubmitNote) {
             routeSubmitNote.hidden = false;
           }
-        });
-      }
+        }
+      });
+
+      routeWizard.addEventListener("route:continue", () => {
+        setWizardStep(3);
+      });
 
       setupParcelCalculator(routeWizard, "data-calc-field", "data-calc-output");
     }
@@ -332,8 +479,28 @@ document.querySelectorAll("[data-current-year]").forEach((node) => {
 
     document.querySelectorAll("[data-scroll-to-wizard]").forEach((button) => {
       button.addEventListener("click", () => {
+        if (routeWizard && simpleCalculator) {
+          ["weight", "length", "width", "height"].forEach((name) => {
+            const source = simpleCalculator.querySelector(`[data-simple-calc-field="${name}"]`);
+            const target = routeWizard.querySelector(`[data-calc-field="${name}"]`);
+
+            if (source?.value && target) {
+              target.value = source.value;
+              target.dispatchEvent(new Event("input", { bubbles: true }));
+            }
+          });
+
+          routeWizard.dispatchEvent(new CustomEvent("route:continue"));
+        }
+
         const routeLeadTarget = routeWizard || routeEircodeForm;
         routeLeadTarget?.scrollIntoView({ behavior: "smooth", block: "center" });
+      });
+    });
+
+    document.querySelectorAll("[data-scroll-to-question]").forEach((button) => {
+      button.addEventListener("click", () => {
+        document.querySelector("#question")?.scrollIntoView({ behavior: "smooth", block: "start" });
       });
     });
 
